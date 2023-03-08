@@ -1,12 +1,14 @@
 "use client"
 import { RandomFox } from "@/components/RandomFox"
 import { MouseEventHandler, useState } from "react";
+import { IImageItem } from "@/types/ramdonFox";
+import { random } from "lodash";
 
-const randomN = (): number => Math.floor(Math.random() * 122) + 1;
+const randomN = () => random(1,122)
 
-type ImageItem = {
-  id: string
-  url: string
+// Generate a funtion that clean the setImages usestate when a button is clicked
+const cleanImages = (setImages: React.Dispatch<React.SetStateAction<IImageItem[]>>) => {
+  setImages([])
 }
 
 const generateId = (): string => {
@@ -20,15 +22,13 @@ const ButtonClass: string = "focus:outline-none text-white bg-purple-700 mt-4 ho
 
 const H1Class: string = "mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white"
 
-
 export default function Home() {
 
-  const [Images, setImages] = useState<Array<ImageItem>>([])
+  const [Images, setImages] = useState<Array<IImageItem>>([])
 
   const addNewFox: MouseEventHandler<HTMLButtonElement> = () => {
 
-
-    const newImage: ImageItem = {
+    const newImage: IImageItem = {
       id: generateId(),
       url: `https://randomfox.ca/images/${randomN()}.jpg`
     }
@@ -39,13 +39,19 @@ export default function Home() {
     <main>
       <div className="mt-4 w-2/4 mx-auto text-center">
         <h1 className={H1Class}>Random Foxes</h1>
-        <button className={ButtonClass} onClick={addNewFox}>Add new fox</button>
-          {Images.map(({id,url}) => (
+        <div className="flex justify-center gap-2">
+          <button className={ButtonClass} onClick={() => cleanImages(setImages)}>Clean images</button>
+          <button className={ButtonClass} onClick={addNewFox}>Add new fox</button>
+        </div>
+          {Images.map(({id,url}, index) => (
             <div className="p-4 h-auto" key={id}>
               <RandomFox 
                 src={url} 
-                className="mx-auto rounded-lg h-60 w-60" 
+                className="mx-auto rounded-full w-80 h-80" 
                 alt="Random Fox"
+                onLazyLoad={(img) => {
+                  console.log(`Image #${index + 1} cargada. Nodo:`, img);
+                }}
               />
             </div>
           ))}
